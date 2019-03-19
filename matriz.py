@@ -4,11 +4,13 @@ def main():
     with open (fname, 'rt') as file:
         entrada =file.read().strip().split()
     linhas=[]
+    quantidade_barra=0
     dictpontos={}
-    dictBAR={}
+    listabar=[]
+    dictIncidencia={}
 
-    txt=["*COORDINATES","*ELEMENT_GROUPS"]
-    def check(fname, txt):
+    txt=["*COORDINATES","*ELEMENT_GROUPS","*INCIDENCES",'*GEOMETRIC_PROPERTIES']      
+    def check(txt):
 
 
 
@@ -20,41 +22,72 @@ def main():
                 txt_pontos=lines
             if entrada[lines] in txt[1]:
                 txt_barra=lines
+            if entrada[lines] in txt[2]:
+                txt_incidencias=lines
+            if entrada[lines] in txt[3]:
+                txt_area=lines
 
 
         pontos(txt_pontos)
-        elementos_barra(txt_barra)
+        listabarras=elementos_barra(txt_barra,txt_incidencias,txt_area)  # nessa linha quantidade de elementos barra é dado como return para posterior uso
 
 
-        # print(linhas)
-        for i in range(len(linhas)):
-            linhas[i]=linhas[i].replace(","," ")
-    def pontos(i):
+        for linha in range(len(linhas)):
+            linhas[linha]=linhas[linha].replace(","," ")
+        return listabar
 
-        quantidade_pontos=entrada[i+1]
+    def pontos(indice_pontos):
 
-        for j in range(1,int(quantidade_pontos)+1):
-            # print(entrada[i+j+1].split())
-            # print(entrada[i+j+1])
-            split=entrada[i+j+1].split()
-            dictpontos[int(entrada[i+j+1][0])]=[float(split[1]),float(split[2])]
-            print(dictpontos)
-    def elementos_barra(i):
+        quantidade_pontos=entrada[indice_pontos+1]
 
-        quantidade_pontos=entrada[i+1]
-        print(entrada)
-        for j in range(1,int(quantidade_pontos)+1):
-            # print(entrada[i+j+1].split())
-            # print(entrada[i+j+1])
-            split=entrada[i+j+1].split()
-            dictBAR[int(entrada[i+j+1][0])]=[float(split[1]),(split[2])]
-            print(dictBAR)
+        for linha in range(1,int(quantidade_pontos)+1):
+            split=entrada[indice_pontos+linha+1].split()
+            dictpontos[int(entrada[indice_pontos+linha+1][0])]=[float(split[1]),float(split[2])]
+
+            
+    def elementos_barra(indice_barras,indice_incidencia,indice_area):
+        indice_incidencia+=1
+        indice_area+=2
+        quantidade_barra=entrada[indice_barras+1]
+        for i in range(1,int(quantidade_barra)+1):
+            a="dicionario{0}".format(i)
+            a={}
+            listabar.append(a)
+        for i in range(0,int(quantidade_barra)):
+            b=listabar[i]
+            b['incidencia']=incidencias(indice_incidencia)
+            b['l']=0
+            b['area']=area(indice_area)
+            b['c'] = 0
+            b['s'] = 0
+            indice_incidencia+=1
+            indice_area+=1
+
+        
 
 
-    string="*COORDINATES"
-    entrada=check('entrada.txt', txt)
-    # pontos(linhas,dictpontos)
-    # print(dictpontos[1])
+
+        return listabar
+
+    def incidencias(indice_barra):
+
+        split=entrada[indice_barra].split()
+        return [int(split[1]),int(split[2])]
+    def area(indice_barra):
+    
+        split=entrada[indice_barra].split()
+
+        return float(split[0])
+
+    
+    
+    BAR=check(txt)
+    print(BAR)
+
+
+    # print(dictpontos)
+    # print(dictBAR)
+    # print(dictIncidencia)
 
 
 
