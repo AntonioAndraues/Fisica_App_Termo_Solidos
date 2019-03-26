@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import numpy as np
 def main():
     fname='entrada.txt'
@@ -11,6 +12,7 @@ def main():
     dictloads={}
 
     txt=["*COORDINATES","*ELEMENT_GROUPS","*INCIDENCES",'*GEOMETRIC_PROPERTIES','*LOADS','*MATERIALS','*BCNODES']      
+
     def check(txt):
 
         for lines in range(len(entrada)):
@@ -35,12 +37,10 @@ def main():
         #print(lista)
         loads(txt_loads)
         listabarras=elementos_barra(txt_barra,txt_incidencias,txt_area,txt_materials)  # nessa linha quantidade de elementos barra é dado como return para posterior uso
-        print(listabarras)
 
         for linha in range(len(linhas)):
             linhas[linha]=linhas[linha].replace(","," ")
-        return listabarras
-        print(listabarras)
+        return listabarras,lista
     def pontos(indice_pontos,indice_bcnodes):
 
         quantidade_pontos=entrada[indice_pontos+1]
@@ -135,9 +135,9 @@ def main():
 
         return float(split[0])
 
+    BAR,NOS = check(txt)
+    return BAR,NOS
     
-    
-    BAR=check(txt)
     ##print(BAR)
     #print(dictloads)
     #print(dictpontos)
@@ -161,8 +161,6 @@ def main():
     M_IR=np.matrix([["F1"],["F2"]])
     # print("Matriz resposta :\n {0}\n =\n {1}".format(M_IR,M_D))
     # print("Matriz resposta :\n {0}\n = \n {1}\n * \n {2}".format(M_R,M_M,M_D))
-
-
 
 # --------------------------------
 if __name__ == '__main__':
