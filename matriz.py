@@ -8,8 +8,9 @@ def main():
     dictpontos={}
     listabar=[]
     dictIncidencia={}
+    dictloads={}
 
-    txt=["*COORDINATES","*ELEMENT_GROUPS","*INCIDENCES",'*GEOMETRIC_PROPERTIES']      
+    txt=["*COORDINATES","*ELEMENT_GROUPS","*INCIDENCES",'*GEOMETRIC_PROPERTIES','*LOADS','*MATERIALS','*BCNODES']      
     def check(txt):
 
 
@@ -26,27 +27,72 @@ def main():
                 txt_incidencias=lines
             if entrada[lines] in txt[3]:
                 txt_area=lines
+            if entrada[lines] in txt[4]:
+                txt_loads=lines
+            if entrada[lines] in txt[5]:
+                txt_materials=lines
+            if entrada[lines] in txt[6]:
+                txt_bcnodes=lines
 
 
-        pontos(txt_pontos)
-        listabarras=elementos_barra(txt_barra,txt_incidencias,txt_area)  # nessa linha quantidade de elementos barra é dado como return para posterior uso
+        lista=pontos(txt_pontos,txt_bcnodes)
+        print(lista)
+        loads(txt_loads)
+        listabarras=elementos_barra(txt_barra,txt_incidencias,txt_area,txt_materials)  # nessa linha quantidade de elementos barra é dado como return para posterior uso
 
 
         for linha in range(len(linhas)):
             linhas[linha]=linhas[linha].replace(","," ")
-        return listabar
+        return listabarras
 
-    def pontos(indice_pontos):
+    def pontos(indice_pontos,indice_bcnodes):
 
         quantidade_pontos=entrada[indice_pontos+1]
-
+        quantidade_bcnodes=entrada[indice_bcnodes+1]
+        lista=[]
+        for linhas in range(1,int(quantidade_bcnodes)+1):
+            split2=entrada[indice_bcnodes+linhas+1].split()
+            lista.append(split2)
+        print(lista)
+        
+        lista2=[]    
         for linha in range(1,int(quantidade_pontos)+1):
             split=entrada[indice_pontos+linha+1].split()
-            dictpontos[int(entrada[indice_pontos+linha+1][0])]=[float(split[1]),float(split[2])]
+            temp=0
+            lista2.append(split)
 
-            
-    def elementos_barra(indice_barras,indice_incidencia,indice_area):
+
+        for item in lista:
+        	if item[0]==entrada[indice_pontos+linha+1][0]:
+        		dictpontos[item[0]]=[float(split[1]),float(split[2]),int(item[1])]
+        	else:
+        		dictpontos[entrada[indice_pontos+linha+1][0]]=[float(split[1]),float(split[2]),0]
+        print(lista2)
+        return lista
+    
+    
+    def loads(indice_loads):
+        
+        quantidade_load=entrada[indice_loads+1]
+        # print(quantidade_load)
+        lista_loads=[0,0]
+        for linha in range(1,int(quantidade_load)+1):
+            # print(entrada[indice_loads+linha+1].split())
+            split=entrada[indice_loads+linha+1].split()
+            if(int(split[1])==1):
+                lista_loads[0]=split[2]
+                lista_loads[1]=0
+                temp=0
+            if(int(split[1])==2):
+                lista_loads[1]=split[2]
+                temp=1
+            dictloads[entrada[indice_loads+linha+1][0]]=[lista_loads[0],lista_loads[1]]
+            if(temp):
+                lista_loads=[0,0]
+
+    def elementos_barra(indice_barras,indice_incidencia,indice_area,incide_materiais):
         indice_incidencia+=1
+        incide_materiais+=2
         indice_area+=2
         quantidade_barra=entrada[indice_barras+1]
         for i in range(1,int(quantidade_barra)+1):
@@ -60,6 +106,7 @@ def main():
             b['area']=area(indice_area)
             b['c'] = 0
             b['s'] = 0
+            b['materias']=materiais(incide_materiais,quantidade_barra)
             indice_incidencia+=1
             indice_area+=1
 
@@ -73,6 +120,11 @@ def main():
 
         split=entrada[indice_barra].split()
         return [int(split[1]),int(split[2])]
+    def materiais(indice_materias,quantidade_barra):
+        split=entrada[indice_materias].split()
+
+        return[float(split[0]),float(split[1]),float(split[2])]
+        
     def area(indice_barra):
     
         split=entrada[indice_barra].split()
@@ -83,6 +135,8 @@ def main():
     
     BAR=check(txt)
     print(BAR)
+    print(dictloads)
+    print(dictpontos)
 
 
     # print(dictpontos)
