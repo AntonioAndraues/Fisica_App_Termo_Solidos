@@ -13,10 +13,6 @@ def main():
     txt=["*COORDINATES","*ELEMENT_GROUPS","*INCIDENCES",'*GEOMETRIC_PROPERTIES','*LOADS','*MATERIALS','*BCNODES']      
     def check(txt):
 
-
-
-
-
         for lines in range(len(entrada)):
             entrada[lines]=entrada[lines].replace(","," ")
             if entrada[lines] in txt[0]:
@@ -36,39 +32,50 @@ def main():
 
 
         lista=pontos(txt_pontos,txt_bcnodes)
-        print(lista)
+        #print(lista)
         loads(txt_loads)
         listabarras=elementos_barra(txt_barra,txt_incidencias,txt_area,txt_materials)  # nessa linha quantidade de elementos barra é dado como return para posterior uso
-
+        print(listabarras)
 
         for linha in range(len(linhas)):
             linhas[linha]=linhas[linha].replace(","," ")
         return listabarras
-
+        print(listabarras)
     def pontos(indice_pontos,indice_bcnodes):
 
         quantidade_pontos=entrada[indice_pontos+1]
         quantidade_bcnodes=entrada[indice_bcnodes+1]
         lista=[]
+        dicionario_pontos={}
         for linhas in range(1,int(quantidade_bcnodes)+1):
             split2=entrada[indice_bcnodes+linhas+1].split()
             lista.append(split2)
-        print(lista)
         
         lista2=[]    
         for linha in range(1,int(quantidade_pontos)+1):
             split=entrada[indice_pontos+linha+1].split()
             temp=0
             lista2.append(split)
+        # print(lista2)
+        for linha in range(1,int(quantidade_bcnodes)+1):
+            # print(entrada[indice_bcnodes+linha+1].split()[0])
+            
+            for i in range(len(lista2)):
+                if (lista2[i][0] == entrada[indice_bcnodes+linha+1].split()[0]):
+                    # print(entrada[indice_bcnodes+linha+1].split()[1])
+                    lista2[i].append(entrada[indice_bcnodes+linha+1].split()[1])
+
+        # print(lista2)
 
 
-        for item in lista:
-        	if item[0]==entrada[indice_pontos+linha+1][0]:
-        		dictpontos[item[0]]=[float(split[1]),float(split[2]),int(item[1])]
-        	else:
-        		dictpontos[entrada[indice_pontos+linha+1][0]]=[float(split[1]),float(split[2]),0]
-        print(lista2)
-        return lista
+        for item in lista2:
+            dicionario_pontos[int(item[0])] = item[1:]
+
+
+
+        return (dicionario_pontos)
+
+
     
     
     def loads(indice_loads):
@@ -110,10 +117,7 @@ def main():
             indice_incidencia+=1
             indice_area+=1
 
-        
-
-
-
+        # print(listabar)
         return listabar
 
     def incidencias(indice_barra):
@@ -134,9 +138,9 @@ def main():
     
     
     BAR=check(txt)
-    print(BAR)
-    print(dictloads)
-    print(dictpontos)
+    ##print(BAR)
+    #print(dictloads)
+    #print(dictpontos)
 
 
     # print(dictpontos)
