@@ -44,68 +44,75 @@ BAR,NOS = main()
 2
 3 1 150
 3 2 -100
-"""
-
-
-def cria_elementos(dict_coordenadas, dict_incidences): #retorna um dic com os pontos de cada barra
-    dict_elementos = {}
-    k=1
-    for incidencia in dict_incidences: #pego as incidencias de cada barra e depois as coordenadas destas incidencias
-        l_p1 = []
-        l_p2 = []
-        p1 = dict_incidences[incidencia][0]
-        p2 = dict_incidences[incidencia][1]
-        x1 = dict_coordenadas[p1][0]
-        y1 = dict_coordenadas[p1][1]
-        x2 = dict_coordenadas[p2][0]
-        y2 = dict_coordenadas[p2][1]
-        l_p1.append(x1)
-        l_p1.append(y1)
-        l_p2.append(x2)
-        l_p2.append(y2)
-        dict_elementos.update({k:l_p1+l_p2})
-        k+=1
-    return dict_elementos
-    
+""" 
         
 def calcula_lsc(listabarras, dict_nos):
-    for barra in listabarras:
-        incidencias = barra["incidencia"]
-        coordenadas_1 = (dict_nos[incidencias[0]][:2])
-        coordenadas_2 = (dict_nos[incidencias[1]][:2])
-        print(coordenadas_1)
-        print(coordenadas_2)
-        x1 = float(coordenadas_1[0])
-        y1 = float(coordenadas_1[1])
-        x2 = float(coordenadas_2[0])
-        y2= float(coordenadas_2[1])
+	for barra in listabarras:
 
-        L = ((x2-x1)**2 + (y2-y1)**2)**(0.5)
-        cosseno = (x2-x1)/L
-        seno = (y2-y1)/L
-        barra["l"] = L
-        barra["s"] = seno
-        barra["c"]=cosseno
-        return listabarras
-#calcula_lsc(BAR,NOS)
+		incidencias = barra["incidencia"]
+		coordenadas_1 = (dict_nos[incidencias[0]][:2])
+		coordenadas_2 = (dict_nos[incidencias[1]][:2])
+		x1 = float(coordenadas_1[0])
+		y1 = float(coordenadas_1[1])
+		x2 = float(coordenadas_2[0])
+		y2= float(coordenadas_2[1])
 
-def cria_rigidez(dict_lsc, dict_materiais, numero_elemento): #numero elemento é 1, 2 , 3 etc
-    # n = len(dict_lsc) #para pegar o numero de elementos
-    # matriz = np.zeros((n,n)) #criando uma matriz com zeros para preencher depois
-    # eal = dict_materiais[numero_elemento]
-    # j = 0 
-    # for i in range(n-1):
-    #     matriz[i][j] = (dict_lsc[numero_elemento][2]**2)
+		L = ((x2-x1)**2 + (y2-y1)**2)**(0.5)
+		cosseno = (x2-x1)/L
+		seno = (y2-y1)/L
+		barra["l"] = L
+		barra["s"] = seno
+		barra["c"]=cosseno      
+	return listabarras
+# lista_n = calcula_lsc(BAR,NOS)
+# print(lista_n)
 
-    return 0
+def cria_rigidez(listabarras): #numero elemento é 1, 2 , 3 etc
+	n = len(listabarras)
+	matriz_rigidez_global = np.zeros((2*n,2*n))
+	for barra in listabarras:
+		incidencias = barra["incidencia"]
+		print(incidencias)
+		b=2*incidencias[0]-1 #matriz global começa em 0 nao em 1
+		a=b-1
+		d=2*incidencias[1]-1
+		c=d-1
+		E = barra["materiais"][0]	
+		area = barra["area"]
+		l = barra["l"]
+		if(l == 0):
+			Eal = 0
+		else:
+			Eal = E*area*(1/l)
+		cos = barra["c"]
+		s = barra["s"]
+		matriz_cs = [[Eal * cos**2,Eal * cos*s,Eal * -cos**2,Eal * -cos*s], 
+		[Eal *cos*s,Eal * s**2,Eal * -cos*s,Eal * -s**2],
+		[Eal *-cos**2,Eal * -cos*s,Eal * cos**2,Eal * cos*s],
+		[Eal *-cos*s,Eal * -s**2,Eal * cos*s,Eal * s**2]]
+
+		matriz_rigidez_global[a][a] += matriz_cs[0][0]
+		matriz_rigidez_global[a][b] += matriz_cs[0][1]
+		matriz_rigidez_global[a][c] += matriz_cs[0][2]
+		matriz_rigidez_global[a][d] += matriz_cs[0][3]
+		matriz_rigidez_global[b][a] += matriz_cs[1][0]
+		matriz_rigidez_global[b][b] += matriz_cs[1][1]
+		matriz_rigidez_global[b][c] += matriz_cs[1][2]
+		matriz_rigidez_global[b][d] += matriz_cs[1][3]
+		matriz_rigidez_global[c][a] += matriz_cs[2][0]
+		matriz_rigidez_global[c][b] += matriz_cs[2][1]
+		matriz_rigidez_global[c][c] += matriz_cs[2][2]
+		matriz_rigidez_global[c][d] += matriz_cs[2][3]
+		matriz_rigidez_global[d][a] += matriz_cs[3][0]
+		matriz_rigidez_global[d][b] += matriz_cs[3][1]
+		matriz_rigidez_global[d][c] += matriz_cs[3][2]
+		matriz_rigidez_global[d][d] += matriz_cs[3][3]
+
+		#print(matriz_rigidez_global)
+	return matriz_rigidez_global
+
+lista_n = calcula_lsc(BAR,NOS)
+matriz_global = cria_rigidez(lista_n)
 
 
-dict_coordenadas = {1: [0.0, 0.0], 2: [0.0, 0.4], 3: [0.3, 0.4]} 
-dict_incidences =  {1: [1, 2], 2: [2, 3], 3: [3, 1]}
-
-dict_elementos = cria_elementos(dict_coordenadas, dict_incidences)
-
-# dict_lsc = calcula_lsc(dict_elementos)
-
-# dict_barras = {1: [1,2,2*10**(-4),0,0], 2: [2,3,2*10**(-4),0,0]], 3: [3,1,2*10**(-4),0,0]}
 

@@ -113,7 +113,7 @@ def main():
             b['area']=area(indice_area)
             b['c'] = 0
             b['s'] = 0
-            b['materias']=materiais(incide_materiais,quantidade_barra)
+            b['materiais']=materiais(incide_materiais,quantidade_barra)
             indice_incidencia+=1
             indice_area+=1
 
@@ -124,8 +124,8 @@ def main():
 
         split=entrada[indice_barra].split()
         return [int(split[1]),int(split[2])]
-    def materiais(indice_materias,quantidade_barra):
-        split=entrada[indice_materias].split()
+    def materiais(indice_materiais,quantidade_barra):
+        split=entrada[indice_materiais].split()
 
         return[float(split[0]),float(split[1]),float(split[2])]
         
