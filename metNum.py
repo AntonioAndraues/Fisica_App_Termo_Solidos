@@ -1,7 +1,7 @@
 # -- coding: UTF-8 --
 import numpy as np
 import copy
-def resolve_gauss(rigidez, forca, it, tol):
+def resolve_gauss(rigidez, forca, it, tol,BCNodes):
     n=len(rigidez)
     U = np.zeros((n,1))
     i = 0
@@ -33,7 +33,7 @@ def resolve_gauss(rigidez, forca, it, tol):
             return U,max(l_erro), i+1
     return U,max(l_erro),i
 
-def resolve_jacobi(rigidez, forca, it, tol):
+def resolve_jacobi(rigidez, forca, it, tol,BCNodes):
     n=len(rigidez)
     U = np.zeros((n,1))
     i = 0
@@ -53,27 +53,52 @@ def resolve_jacobi(rigidez, forca, it, tol):
             l_erro.append(erro)
         i+=1
         if erro<tol:
-            return U,max(l_erro), i
-    return U,max(l_erro),i
+            itera=i
+            break
+    Listaresp=[]
+    l=0
+    for k in range(2*n):
+        if (k+1) in BCNodes:
+            Listaresp.append(U[l])
+            l+=1 
+        else:
+            Listaresp.append(0)
+    DicResp ={}
+    No=0
+    for D in range(n):
+        DicResp[D+1]=[float(Listaresp[No]),float(Listaresp[No+1])]
+        No+=2
+    return DicResp,max(l_erro),itera
 
 
 
 
 
 
-rigidez = 10**8*np.array([[1.59,-0.4, -0.54,1.2],[-0.4,1.7, 0.4,1.2], [-0.54, 0.4, 0.54,1.2],[-0.54, 1.4, 0.53,1.1] ])
+# rigidez = 10**8*np.array([[1.59,-0.4, -0.54],[-0.4,1.7, 0.4], [-0.54, 0.4, 0.54]])
 
-forca = np.array([[0],[150], [-100],[30]])
+# forca = np.array([[0],[150], [-100]])
 
-it = int(input("Qual o número de interações?"))
-tol = float(input("Qual a tolerância? "))
-U_gauss, erro_gauss,itGauss = resolve_gauss(rigidez, forca, it, tol)
-U_jacobi, erro_jacobi,itJacobi = resolve_jacobi(rigidez, forca, it, tol)
+# BCNodes=[2,5,6]
 
-print("U gauss: ", U_gauss)
-print("Erro gauss: ",erro_gauss)
-print("Iterações necessárias gauss: ", itGauss)
 
-print("U jacobi: ", U_jacobi)
-print("Erro jacobi: ", erro_jacobi)
-print("Iterações necessárias jacobi: ", itJacobi)
+# it = int(input("Qual o número de interações?"))
+# tol = float(input("Qual a tolerância? "))
+
+
+
+#######################    TESTE JACOB    ###############################
+
+# U_jacobi, erro_jacobi,itJacobi = resolve_jacobi(rigidez, forca, it, tol,BCNodes)
+# print("U jacobi: ", U_jacobi)
+# print("Erro jacobi: ", erro_jacobi)
+# print("Iterações necessárias jacobi: ", itJacobi)
+
+
+
+
+#######################   TESTE GAUS    ##############################
+# U_gauss, erro_gauss,itGauss = resolve_gauss(rigidez, forca, it, tol,BCNodes)
+# print("U gauss: ", U_gauss)
+# print("Erro gauss: ",erro_gauss)
+# print("Iterações necessárias gauss: ", itGauss)
