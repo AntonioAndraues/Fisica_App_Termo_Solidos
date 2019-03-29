@@ -58,7 +58,7 @@ def resolve_jacobi(rigidez, forca, it, tol,BCNodes):
     Listaresp=[]
     l=0
     for k in range(2*n):
-        if (k+1) in BCNodes:
+        if (k) in BCNodes:
             Listaresp.append(U[l])
             l+=1 
         else:

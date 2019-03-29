@@ -124,7 +124,7 @@ def aplica_restricao(lista,matriz_global):
 				if(coluna>=len(lista)):
 					linha+=1
 					coluna=0
-				
+	return matriz_restricao			
 def loads(nos,loads,lista):
 	matriz_PG= np.zeros((2*len(nos),1))
 	matriz_array=np.zeros((len(lista),1))
@@ -137,7 +137,7 @@ def loads(nos,loads,lista):
 			pass
 	for i in range(len(lista)):
 		matriz_array[i][0]=matriz_PG[lista[i]][0]
-	
+	return matriz_array
 		
 def bcnodes(nos):
 	lista_nos_livres = []
@@ -167,8 +167,18 @@ def bcnodes(nos):
 lista_liberdade = bcnodes(NOS)
 lista_n = calcula_lsc(BAR,NOS)
 matriz_global = cria_rigidez(lista_n)
-aplica_restricao(lista_liberdade, matriz_global)
-loads(NOS,LOADS,lista_liberdade)
+matriz_restricao=aplica_restricao(lista_liberdade, matriz_global)
+matriz_array=loads(NOS,LOADS,lista_liberdade)
+
+
+#######################    TESTE JACOB    ###############################
+it = int(input("Qual o número de interações?"))
+tol = float(input("Qual a tolerância? "))
+
+U_jacobi, erro_jacobi,itJacobi = resolve_jacobi(matriz_restricao, matriz_array, it, tol,lista_liberdade)
+print("U jacobi: ", U_jacobi)
+print("Erro jacobi: ", erro_jacobi)
+print("Iterações necessárias jacobi: ", itJacobi)
 
 
 
