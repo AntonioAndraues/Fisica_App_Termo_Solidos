@@ -33,26 +33,35 @@ def resolve_gauss(rigidez, forca, it, tol,BCNodes):
             return U,max(l_erro), i+1
     return U,max(l_erro),i
 
-def resolve_jacobi(rigidez, forca, it, tol,BCNodes):
-    n=len(rigidez)
-    U = np.zeros((n,1))
+def resolve_jacobi(n_nos,rigidez, forca, it, tol,BCNodes):
+    print(rigidez)
+    print(forca)
+    n=int(n_nos/2)
+    nr=len(rigidez)
+    U = np.zeros((nr,1))
     i = 0
+    itera=0
     while (i<it):
         l_erro = []
         U_anterior =  copy.copy(U)
-        for j in range(n):
+        for j in range(nr):
             U[j] = forca[j]
-            for k in  range(n):
+            for k in  range(nr):
                 if k!=j:
                     U[j]-=(rigidez[j,k]*U_anterior[k])
             U[j]=U[j]/rigidez[j,j]
-            if(U[j] == j):
-                erro = 0
+
+
+            if(U[j] == 0):
+                erro = 1
             else:
                 erro = ((U[j] - U_anterior[j])/U[j])
+
             l_erro.append(erro)
+        
+
         i+=1
-        if erro<tol:
+        if max(l_erro)<tol:
             itera=i
             break
     Listaresp=[]
@@ -63,6 +72,7 @@ def resolve_jacobi(rigidez, forca, it, tol,BCNodes):
             l+=1 
         else:
             Listaresp.append(0)
+
     DicResp ={}
     No=0
     for D in range(n):

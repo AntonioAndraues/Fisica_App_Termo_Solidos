@@ -1,10 +1,3 @@
-
-
-dicionario_deslocamento = {1: [30,10], 2: [5,15],3:[20,20]}
-dicionario_forcas_reacao = {1: [10,0],2:[40,30]}
-dicionario_deformacao_elemento = {1:20,2:20,3:30}
-dicionario_elemento_estresse = {1:10,2:10,3:10}
-
 arquivo_saida= open("saida.txt","w+")
 pular_linha = "\n"
 
