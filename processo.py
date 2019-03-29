@@ -2,6 +2,7 @@
 import numpy as np
 from matriz import main
 from metNum import resolve_jacobi
+from saida import *
 
 BAR,NOS,LOADS = main()
 
@@ -162,9 +163,64 @@ def bcnodes(nos):
 	for contador in range(len(lista_nos_livres)):
 		if lista_nos_livres[contador] == 0:
 			lista_liberdade.append(contador)
-	return lista_liberdade
 
-lista_liberdade = bcnodes(NOS)
+	return lista_liberdade,lista_nos_livres
+
+
+def tensao(barras, jacobi):
+	E = 210*10^9
+	a=1
+	dicionario_tensao = {}
+	for barra in barras:
+		matriz_s_c = [[-barra['c'],-barra['s'],barra['c'],barra['s']]]
+		matriz_desloc = ([[jacobi[barra['incidencia'][0]][0]],[jacobi[barra['incidencia'][0]][1]],[jacobi[barra['incidencia'][1]][0]],[jacobi[barra['incidencia'][1]][1]]])
+		mult_matriz = (np.dot(matriz_s_c,matriz_desloc)[0][0])
+		tensao = (E/barra['l'])*mult_matriz
+		dicionario_tensao[a]=tensao
+		a+=1
+	return dicionario_tensao
+
+def deformacao(barras, jacobi):
+	a=1
+	dicionario_deformacao = {}
+	for barra in barras:
+		matriz_s_c = [[-barra['c'],-barra['s'],barra['c'],barra['s']]]
+		matriz_desloc = ([[jacobi[barra['incidencia'][0]][0]],[jacobi[barra['incidencia'][0]][1]],[jacobi[barra['incidencia'][1]][0]],[jacobi[barra['incidencia'][1]][1]]])
+		mult_matriz = (np.dot(matriz_s_c,matriz_desloc)[0][0])
+		tensao = (1/barra['l'])*mult_matriz
+		dicionario_deformacao[a]=tensao
+		a+=1
+	return dicionario_deformacao
+
+def forcasResultantes(matriz_global,jacobi,lista_nos_livres):
+	lista_deslocamento = []
+
+	for i in jacobi:
+		lista_deslocamento.append(jacobi[i][0])
+		lista_deslocamento.append(jacobi[i][1])
+
+	matriz=np.zeros((len(lista_deslocamento),1))
+	for i in range(len(lista_deslocamento)):
+		matriz[i][0]=lista_deslocamento[i]
+
+	matriz_forcas = np.dot(matriz_global,matriz)
+	lista_temp=[]
+	for item in matriz_forcas:
+		lista_temp.append(item[0])
+
+	lista_presos = []
+	for contador in range(len(lista_nos_livres)):
+		if lista_nos_livres[contador] == 1:
+			lista_presos.append(lista_temp[contador])
+		if lista_nos_livres[contador] == 0:
+			lista_presos.append(0)
+
+	return lista_presos
+
+
+
+
+lista_liberdade,lista_nos_livres = bcnodes(NOS)
 lista_n = calcula_lsc(BAR,NOS)
 matriz_global = cria_rigidez(lista_n)
 matriz_restricao=aplica_restricao(lista_liberdade, matriz_global)
@@ -176,9 +232,23 @@ it = int(input("Qual o número de interações?"))
 tol = float(input("Qual a tolerância? "))
 
 U_jacobi, erro_jacobi,itJacobi = resolve_jacobi(matriz_restricao, matriz_array, it, tol,lista_liberdade)
-print("U jacobi: ", U_jacobi)
-print("Erro jacobi: ", erro_jacobi)
-print("Iterações necessárias jacobi: ", itJacobi)
+
+
+dicionario_deslocamento = U_jacobi
+dicionario_elemento_deformacao = deformacao(BAR,U_jacobi)
+dicionario_elemento_tensao = tensao(BAR,U_jacobi)
+lista_reacoes = forcasResultantes(matriz_global,U_jacobi,lista_nos_livres)
+
+
+
+arquivo_saida= open("saida.txt","w+")
+
+saidaDeslocamento(arquivo_saida,dicionario_deslocamento)
+saidaForcasReacao(arquivo_saida,lista_reacoes)
+saidaDeformacaoElemento(arquivo_saida,dicionario_elemento_deformacao)
+saidaTensaoElemento(arquivo_saida,dicionario_elemento_tensao)
+# print("Erro jacobi: ", erro_jacobi)
+# print("Iterações necessárias jacobi: ", itJacobi)
 
 
 
