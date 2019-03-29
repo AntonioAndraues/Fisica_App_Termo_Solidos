@@ -136,7 +136,7 @@ def main():
         return float(split[0])
 
     BAR,NOS = check(txt)
-    return BAR,NOS
+    return BAR,NOS,dictloads
     
     ##print(BAR)
     #print(dictloads)

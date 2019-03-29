@@ -65,15 +65,16 @@ rigidez = 10**8*np.array([[1.59,-0.4, -0.54,1.2],[-0.4,1.7, 0.4,1.2], [-0.54, 0.
 
 forca = np.array([[0],[150], [-100],[30]])
 
-it = int(input("Qual o número de interações?"))
-tol = float(input("Qual a tolerância? "))
-U_gauss, erro_gauss,itGauss = resolve_gauss(rigidez, forca, it, tol)
-U_jacobi, erro_jacobi,itJacobi = resolve_jacobi(rigidez, forca, it, tol)
+# it = int(input("Qual o número de interações?"))
+# tol = float(input("Qual a tolerância? "))
 
-print("U gauss: ", U_gauss)
-print("Erro gauss: ",erro_gauss)
-print("Iterações necessárias gauss: ", itGauss)
+# U_gauss, erro_gauss,itGauss = resolve_gauss(rigidez, forca, it, tol)
+# U_jacobi, erro_jacobi,itJacobi = resolve_jacobi(rigidez, forca, it, tol)
 
-print("U jacobi: ", U_jacobi)
-print("Erro jacobi: ", erro_jacobi)
-print("Iterações necessárias jacobi: ", itJacobi)
+# print("U gauss: ", U_gauss)
+# print("Erro gauss: ",erro_gauss)
+# print("Iterações necessárias gauss: ", itGauss)
+
+# print("U jacobi: ", U_jacobi)
+# print("Erro jacobi: ", erro_jacobi)
+# print("Iterações necessárias jacobi: ", itJacobi)

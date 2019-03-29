@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 from matriz import main
+from metNum import resolve_jacobi
 
-BAR,NOS = main()
+BAR,NOS,LOADS = main()
 
 """
 *COORDINATES
@@ -64,15 +65,13 @@ def calcula_lsc(listabarras, dict_nos):
 		barra["s"] = seno
 		barra["c"]=cosseno      
 	return listabarras
-# lista_n = calcula_lsc(BAR,NOS)
-# print(lista_n)
 
 def cria_rigidez(listabarras): #numero elemento é 1, 2 , 3 etc
 	n = len(listabarras)
 	matriz_rigidez_global = np.zeros((2*n,2*n))
 	for barra in listabarras:
 		incidencias = barra["incidencia"]
-		print(incidencias)
+		# print(incidencias)
 		b=2*incidencias[0]-1 #matriz global começa em 0 nao em 1
 		a=b-1
 		d=2*incidencias[1]-1
@@ -107,12 +106,83 @@ def cria_rigidez(listabarras): #numero elemento é 1, 2 , 3 etc
 		matriz_rigidez_global[d][b] += matriz_cs[3][1]
 		matriz_rigidez_global[d][c] += matriz_cs[3][2]
 		matriz_rigidez_global[d][d] += matriz_cs[3][3]
-
-		#print(matriz_rigidez_global)
 	return matriz_rigidez_global
 
+
+def aplica_restricao(lista,matriz_global):
+	matriz_restricao = []
+	linha=0
+	coluna=0
+	n=(len(lista))
+	matriz_restricao = np.zeros((n,n))
+	
+	for j in range(len(matriz_global)):
+		for i in range(len(matriz_global)):
+			if (j in lista and i in lista):
+				matriz_restricao[linha][coluna]=matriz_global[i][j]
+				coluna+=1
+				if(coluna>=len(lista)):
+					linha+=1
+					coluna=0
+				
+def loads(nos,loads,lista):
+	matriz_PG= np.zeros((2*len(nos),1))
+	matriz_array=np.zeros((len(lista),1))
+	for no in nos:
+		try:	
+			matriz_PG[no*2-2][0]=loads[str(no)][0]
+			matriz_PG[no*2-1][0]=loads[str(no)][1]
+
+		except:
+			pass
+	for i in range(len(lista)):
+		matriz_array[i][0]=matriz_PG[lista[i]][0]
+	
+		
+def bcnodes(nos):
+	lista_nos_livres = []
+
+	for no in nos:
+		lista_restricoes = nos[no][2:]
+		while len(lista_restricoes) <=1:
+			lista_restricoes.append(0)
+		for i in range(len(lista_restricoes)):
+			lista_restricoes[i]=int(lista_restricoes[i])
+		if lista_restricoes[0]==2:
+			lista_restricoes.sort()
+		for i in lista_restricoes:
+			if i == 1:
+				lista_nos_livres.append(1)
+			if i == 2:
+				lista_nos_livres.append(1)
+			if i==0:
+				lista_nos_livres.append(0)
+
+	lista_liberdade =[]
+	for contador in range(len(lista_nos_livres)):
+		if lista_nos_livres[contador] == 0:
+			lista_liberdade.append(contador)
+	return lista_liberdade
+
+lista_liberdade = bcnodes(NOS)
 lista_n = calcula_lsc(BAR,NOS)
 matriz_global = cria_rigidez(lista_n)
+aplica_restricao(lista_liberdade, matriz_global)
+loads(NOS,LOADS,lista_liberdade)
 
+
+
+# it = int(input("Qual o número de interações?"))
+# tol = float(input("Qual a tolerância? "))
+# U_gauss, erro_gauss,itGauss = resolve_gauss(rigidez, forca, it, tol)
+# U_jacobi, erro_jacobi,itJacobi = resolve_jacobi(rigidez, forca, it, tol)
+
+# print("U gauss: ", U_gauss)
+# print("Erro gauss: ",erro_gauss)
+# print("Iterações necessárias gauss: ", itGauss)
+
+# print("U jacobi: ", U_jacobi)
+# print("Erro jacobi: ", erro_jacobi)
+# print("Iterações necessárias jacobi: ", itJacobi)
 
 
