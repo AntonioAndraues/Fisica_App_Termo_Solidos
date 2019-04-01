@@ -75,7 +75,6 @@ def cria_rigidez(listabarras):  # numero elemento é 1, 2 , 3 etc
     matriz_rigidez_global = np.zeros((2*n, 2*n))
     for barra in listabarras:
         incidencias = barra["incidencia"]
-        # print(incidencias)
         b = 2*incidencias[0]-1  # matriz global começa em 0 nao em 1
         a = b-1
         d = 2*incidencias[1]-1
@@ -118,9 +117,9 @@ def aplica_restricao(lista, matriz_global):
     linha = 0
     coluna = 0
     n = (len(lista))
-    # print(lista)
+
     matriz_restricao = np.zeros((n, n))
-    # print(len(matriz_restricao))
+
     for j in range(len(matriz_global)):
         for i in range(len(matriz_global)):
             if (j in lista and i in lista):
@@ -235,7 +234,7 @@ matriz_restricao = aplica_restricao(lista_liberdade, matriz_global)
 matriz_array = loads(NOS, LOADS, lista_liberdade)
 
 
-#######################    TESTE JACOB    ###############################
+#######################    TESTE JACOBI    ###############################
 it = int(input("Qual o número de interações?"))
 tol = float(input("Qual a tolerância? "))
 l_global = len(matriz_global)
@@ -255,4 +254,3 @@ saidaDeslocamento(arquivo_saida, dicionario_deslocamento)
 saidaForcasReacao(arquivo_saida, lista_reacoes)
 saidaDeformacaoElemento(arquivo_saida, dicionario_elemento_deformacao)
 saidaTensaoElemento(arquivo_saida, dicionario_elemento_tensao)
-
