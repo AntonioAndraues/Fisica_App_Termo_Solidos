@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 def main():
-    fname='entrada.txt'
+    fname='aps2input.txt'
     with open (fname, 'rt') as file:
         entrada =file.read().strip().split()
     linhas=[]
