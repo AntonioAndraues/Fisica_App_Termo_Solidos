@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 from matriz import main
+from metNum import resolve_gauss
 from metNum import resolve_jacobi
 from saida import *
 
@@ -168,37 +169,37 @@ def bcnodes(nos):
 	return lista_liberdade,lista_nos_livres
 
 
-def tensao(barras, jacobi):
+def tensao(barras, gauss):
 	a=1
 	dicionario_tensao = {}
 	for barra in barras:
 		matriz_s_c = [[-barra['c'],-barra['s'],barra['c'],barra['s']]]
-		matriz_desloc = ([[jacobi[barra['incidencia'][0]][0]],[jacobi[barra['incidencia'][0]][1]],[jacobi[barra['incidencia'][1]][0]],[jacobi[barra['incidencia'][1]][1]]])
+		matriz_desloc = ([[gauss[barra['incidencia'][0]][0]],[gauss[barra['incidencia'][0]][1]],[gauss[barra['incidencia'][1]][0]],[gauss[barra['incidencia'][1]][1]]])
 		mult_matriz = (np.dot(matriz_s_c,matriz_desloc)[0][0])
 		tensao = (barra['materiais'][0]/barra['l'])*mult_matriz
 		dicionario_tensao[a]=tensao
 		a+=1
 	return dicionario_tensao
 
-def deformacao(barras, jacobi):
+def deformacao(barras, gauss):
 	a=1
 	dicionario_deformacao = {}
 	for barra in barras:
 		matriz_s_c = [[-barra['c'],-barra['s'],barra['c'],barra['s']]]
-		matriz_desloc = ([[jacobi[barra['incidencia'][0]][0]],[jacobi[barra['incidencia'][0]][1]],[jacobi[barra['incidencia'][1]][0]],[jacobi[barra['incidencia'][1]][1]]])
+		matriz_desloc = ([[gauss[barra['incidencia'][0]][0]],[gauss[barra['incidencia'][0]][1]],[gauss[barra['incidencia'][1]][0]],[gauss[barra['incidencia'][1]][1]]])
 		mult_matriz = (np.dot(matriz_s_c,matriz_desloc)[0][0])
 		tensao = (1/barra['l'])*mult_matriz
 		dicionario_deformacao[a]=tensao
 		a+=1
 	return dicionario_deformacao
 
-def forcasResultantes(matriz_global,jacobi,lista_nos_livres):
+def forcasResultantes(matriz_global,gauss,lista_nos_livres):
 	lista_deslocamento = []
 
 
-	for i in jacobi:
-		lista_deslocamento.append(jacobi[i][0])
-		lista_deslocamento.append(jacobi[i][1])
+	for i in gauss:
+		lista_deslocamento.append(gauss[i][0])
+		lista_deslocamento.append(gauss[i][1])
 
 
 	matriz=np.zeros((len(lista_deslocamento),1))
@@ -234,13 +235,13 @@ matriz_array=loads(NOS,LOADS,lista_liberdade)
 it = int(input("Qual o número de interações?"))
 tol = float(input("Qual a tolerância? "))
 l_global = len(matriz_global)
-U_jacobi, erro_jacobi,itJacobi = resolve_jacobi(l_global,matriz_restricao, matriz_array, it, tol,lista_liberdade)
+U_gauss, erro_gauss,itgauss = resolve_gauss(l_global,matriz_restricao, matriz_array, it, tol,lista_liberdade)
 
-print(U_jacobi)
-dicionario_deslocamento = U_jacobi
-dicionario_elemento_deformacao = deformacao(BAR,U_jacobi)
-dicionario_elemento_tensao = tensao(BAR,U_jacobi)
-lista_reacoes = forcasResultantes(matriz_global,U_jacobi,lista_nos_livres)
+print(U_gauss)
+dicionario_deslocamento = U_gauss
+dicionario_elemento_deformacao = deformacao(BAR,U_gauss)
+dicionario_elemento_tensao = tensao(BAR,U_gauss)
+lista_reacoes = forcasResultantes(matriz_global,U_gauss,lista_nos_livres)
 
 
 
@@ -250,22 +251,22 @@ saidaDeslocamento(arquivo_saida,dicionario_deslocamento)
 saidaForcasReacao(arquivo_saida,lista_reacoes)
 saidaDeformacaoElemento(arquivo_saida,dicionario_elemento_deformacao)
 saidaTensaoElemento(arquivo_saida,dicionario_elemento_tensao)
-# print("Erro jacobi: ", erro_jacobi)
-# print("Iterações necessárias jacobi: ", itJacobi)
+# print("Erro gauss: ", erro_gauss)
+# print("Iterações necessárias gauss: ", itgauss)
 
 
 
 # it = int(input("Qual o número de interações?"))
 # tol = float(input("Qual a tolerância? "))
-# U_gauss, erro_gauss,itGauss = resolve_gauss(rigidez, forca, it, tol)
-# U_jacobi, erro_jacobi,itJacobi = resolve_jacobi(rigidez, forca, it, tol)
+# U_gausss, erro_gausss,itgausss = resolve_gausss(rigidez, forca, it, tol)
+# U_gauss, erro_gauss,itgauss = resolve_gauss(rigidez, forca, it, tol)
+
+# print("U gausss: ", U_gausss)
+# print("Erro gausss: ",erro_gausss)
+# print("Iterações necessárias gausss: ", itgausss)
 
 # print("U gauss: ", U_gauss)
-# print("Erro gauss: ",erro_gauss)
-# print("Iterações necessárias gauss: ", itGauss)
-
-# print("U jacobi: ", U_jacobi)
-# print("Erro jacobi: ", erro_jacobi)
-# print("Iterações necessárias jacobi: ", itJacobi)
+# print("Erro gauss: ", erro_gauss)
+# print("Iterações necessárias gauss: ", itgauss)
 
 
