@@ -8,7 +8,6 @@ def main():
         entrada = file.read().strip().split()
     linhas = []
 
-    dictpontos = {}
     listabar = []
 
     dictloads = {}
