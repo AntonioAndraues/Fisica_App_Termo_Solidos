@@ -238,8 +238,25 @@ matriz_array = loads(NOS, LOADS, lista_liberdade)
 it = int(input("Qual o número de interações?"))
 tol = float(input("Qual a tolerância? "))
 l_global = len(matriz_global)
-U_gauss, erro_gauss, itgauss = resolve_gauss(
-    l_global, matriz_restricao, matriz_array, it, tol, lista_liberdade)
+flag_metodo = 0
+
+
+while True:
+    flag_metodo = (input("Deseja rodar Gaus digite (1), se desejar rodar jacobi digite (0)? "))
+    if flag_metodo == '1':
+        print("Metodo Utilizado Gaus")
+        U_gauss, erro_gauss, itgauss = resolve_gauss(
+        l_global, matriz_restricao, matriz_array, it, tol, lista_liberdade)
+        break
+    elif(flag_metodo=='0'):
+        print("Metodo Utilizado Jacobi")
+        U_gauss, erro_gauss, itgauss = resolve_jacobi(
+        l_global, matriz_restricao, matriz_array, it, tol, lista_liberdade)
+        break
+    else:
+        pass
+
+
 
 print(U_gauss)
 dicionario_deslocamento = U_gauss
